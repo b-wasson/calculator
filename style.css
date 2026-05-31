@@ -1,0 +1,44 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+  font-family: "Faculty Glyphic", serif;
+  background: #111;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #eee;
+}
+
+#main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 400px;
+  padding: 24px;
+}
+
+
+#currEq {
+    width: 100%;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 8px 0;
+    color: #eee;
+  }
+
+#currEq::-webkit-outer-spin-button,
+#currEq::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+  

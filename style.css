@@ -12,6 +12,7 @@ body {
   justify-content: center;
   align-items: center;
   color: #eee;
+  color-scheme: dark;
 }
 
 #main {
@@ -24,21 +25,21 @@ body {
   padding: 24px;
 }
 
+math-field::part(menu-toggle) {
+    display: none;
+}
 
 #currEq {
     width: 100%;
-    text-align: center;
+    min-height: 64px;
     font-size: 2rem;
-    font-weight: 700;
     background: transparent;
     border: none;
     outline: none;
     padding: 8px 0;
+    cursor: text;
     color: #eee;
-  }
-
-#currEq::-webkit-outer-spin-button,
-#currEq::-webkit-inner-spin-button {
-  -webkit-appearance: none;
+    --caret-color: #eee;
+    --selection-background-color: #444;
 }
   

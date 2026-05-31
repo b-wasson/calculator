@@ -42,4 +42,13 @@ math-field::part(menu-toggle) {
     --caret-color: #eee;
     --selection-background-color: #444;
 }
+
+#result {
+    width: 100%;
+    font-size: 2rem;
+    color: #aaa;
+    text-align: right;
+    border-top: 1px solid #333;
+    padding-top: 16px;
+}
   

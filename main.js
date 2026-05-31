@@ -1,1 +1,0 @@
-const currEq = document.getElementById("currEq");

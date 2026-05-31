@@ -8,9 +8,15 @@ function init() {
     mf.focus();
 }
 
+const result = document.getElementById("result");
+
 mf.addEventListener("input", () => {
-    const latex = mf.getValue();
-    console.log(latex);
+    try {
+        const value = math.evaluate(mf.getValue("ascii-math"));
+        result.textContent = "= " + value;
+    } catch {
+        result.textContent = "";
+    }
 });
 
 init();

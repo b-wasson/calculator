@@ -104,6 +104,118 @@ body {
     border-color: #444;
 }
 
+/* ── Settings Button ──────────────────────────────────── */
+
+#settings-btn {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    background: none;
+    border: 1px solid #2a2a2a;
+    color: #555;
+    font-size: 1.1rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+#settings-btn:hover {
+    color: #aaa;
+    border-color: #444;
+}
+
+/* ── Settings Modal ───────────────────────────────────── */
+
+#settings-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+}
+
+#settings-overlay.open {
+    display: flex;
+}
+
+#settings-panel {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    width: 320px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#settings-title {
+    font-size: 0.85rem;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+#settings-close {
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+#settings-close:hover {
+    color: #aaa;
+}
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setting-label {
+    font-size: 0.95rem;
+    color: #aaa;
+}
+
+.toggle-group {
+    display: flex;
+    border: 1px solid #333;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    color: #555;
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 5px 12px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+}
+
+.toggle-btn.active {
+    background: #2a2a2a;
+    color: #eee;
+}
+
 /* ── Expressions ──────────────────────────────────────── */
 
 #main {

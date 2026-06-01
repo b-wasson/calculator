@@ -14,6 +14,24 @@
     <script defer src="script.js"></script>
 </head>
 <body>
+    <button id="settings-btn">⚙</button>
+
+    <div id="settings-overlay">
+        <div id="settings-panel">
+            <div id="settings-header">
+                <p id="settings-title">Settings</p>
+                <button id="settings-close">×</button>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label">Angle Mode</span>
+                <div class="toggle-group">
+                    <button class="toggle-btn active" data-value="rad">RAD</button>
+                    <button class="toggle-btn" data-value="deg">DEG</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="app">
         <div id="sidebar">
 <p id="var-title">Variables</p>

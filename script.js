@@ -137,6 +137,22 @@ function init() {
     mathVirtualKeyboard.hide();
     createRow();
     document.getElementById("add-var").addEventListener("click", createVarRow);
+
+    const overlay = document.getElementById("settings-overlay");
+    document.getElementById("settings-btn").addEventListener("click", () => overlay.classList.add("open"));
+    document.getElementById("settings-close").addEventListener("click", () => overlay.classList.remove("open"));
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.remove("open"); });
+
+    document.querySelectorAll(".toggle-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            if (ce) {
+                try { ce.angularUnit = btn.dataset.value; } catch {}
+                reevaluateAll();
+            }
+        });
+    });
 }
 
 init();

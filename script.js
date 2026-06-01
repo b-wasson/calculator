@@ -1,17 +1,65 @@
-const scope = {};
+let ce = null;
+
+// Load CE in the background — init() runs immediately without waiting
+(async () => {
+    try {
+        const { ComputeEngine } = await import('https://unpkg.com/@cortex-js/compute-engine?module');
+        ce = new ComputeEngine();
+        reevaluateAll();
+    } catch (e) {
+        console.warn('ComputeEngine failed to load:', e);
+    }
+})();
+
+const assignedVars = new Set();
+
+function evalLatex(latex) {
+    if (!ce || !latex) return null;
+    try {
+        const result = ce.parse(latex).N();
+        const val = result.numericValue;
+        if (val === null || val === undefined) return null;
+        // Plain JS number
+        if (typeof val === 'number') {
+            if (!isFinite(val)) return null;
+            return parseFloat(val.toPrecision(10)).toString();
+        }
+        // Decimal.js bignum (has .toNumber())
+        if (typeof val.toNumber === 'function') {
+            const n = val.toNumber();
+            if (!isFinite(n)) return null;
+            return parseFloat(n.toPrecision(10)).toString();
+        }
+        return val.toString();
+    } catch {
+        return null;
+    }
+}
 
 function updateScope() {
-    for (const key of Object.keys(scope)) delete scope[key];
-    document.querySelectorAll(".var-row").forEach(row => {
-        const raw = row.querySelector(".var-input").getValue("ascii-math");
-        const idx = raw.indexOf("=");
-        if (idx === -1) return;
-        const name = raw.slice(0, idx).trim();
-        const val = raw.slice(idx + 1).trim();
-        if (name && val) {
-            try { scope[name] = math.evaluate(val); } catch {}
-        }
-    });
+    for (const name of assignedVars) {
+        try { ce.assign(name, undefined); } catch {}
+    }
+    assignedVars.clear();
+
+    const rows = [...document.querySelectorAll(".var-row")];
+    for (let pass = 0; pass < 2; pass++) {
+        rows.forEach(row => {
+            const mf = row.querySelector(".var-input");
+            const ascii = mf.getValue("ascii-math");
+            const latex = mf.getValue("latex");
+            const aIdx = ascii.indexOf("=");
+            const lIdx = latex.indexOf("=");
+            if (aIdx === -1 || lIdx === -1) return;
+            const name = ascii.slice(0, aIdx).trim();
+            const valLatex = latex.slice(lIdx + 1).trim();
+            if (!name || !valLatex) return;
+            try {
+                ce.assign(name, ce.parse(valLatex).N());
+                assignedVars.add(name);
+            } catch {}
+        });
+    }
     reevaluateAll();
 }
 
@@ -19,11 +67,8 @@ function reevaluateAll() {
     document.querySelectorAll(".expr-row").forEach(row => {
         const mf = row.querySelector("math-field");
         const result = row.querySelector(".result");
-        try {
-            result.textContent = "= " + math.evaluate(mf.getValue("ascii-math"), { ...scope });
-        } catch {
-            result.textContent = "";
-        }
+        const val = evalLatex(mf.getValue("latex"));
+        result.textContent = val !== null ? "= " + val : "";
     });
 }
 
@@ -40,7 +85,6 @@ function createVarRow() {
     del.addEventListener("click", () => { row.remove(); updateScope(); });
 
     row.append(mf, del);
-
     document.getElementById("var-list").appendChild(row);
 
     mf.mathVirtualKeyboardPolicy = "manual";
@@ -59,18 +103,14 @@ function createRow() {
 
     row.appendChild(mf);
     row.appendChild(result);
-
     document.getElementById("expressions").appendChild(row);
 
     mf.mathVirtualKeyboardPolicy = "manual";
     mf.menuItems = [];
 
     mf.addEventListener("input", () => {
-        try {
-            result.textContent = "= " + math.evaluate(mf.getValue("ascii-math"), { ...scope });
-        } catch {
-            result.textContent = "";
-        }
+        const val = evalLatex(mf.getValue("latex"));
+        result.textContent = val !== null ? "= " + val : "";
     });
 
     mf.addEventListener("keydown", (event) => {

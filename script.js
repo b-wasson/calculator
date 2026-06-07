@@ -13,26 +13,34 @@ let ce = null;
 
 const assignedVars = new Set();
 
-function evalLatex(latex) {
-    if (!ce || !latex) return null;
+// Matches the \ans command inserted by the "ans" inline shortcut, but not
+// longer command names that happen to start with "ans" (e.g. \answer)
+const ANS_PATTERN = /\\ans(?![a-zA-Z])/g;
+
+function evaluateLatex(latex, ansLatex) {
+    if (!ce || !latex) return { ansLatex: null, text: null };
+    if (latex.search(ANS_PATTERN) !== -1) {
+        if (ansLatex === undefined) return { ansLatex: null, text: null };
+        latex = latex.replace(ANS_PATTERN, "(" + ansLatex + ")");
+    }
     try {
         const result = ce.parse(latex).N();
         const val = result.numericValue;
-        if (val === null || val === undefined) return null;
+        if (val === null || val === undefined) return { ansLatex: null, text: null };
         // Plain JS number
         if (typeof val === 'number') {
-            if (!isFinite(val)) return null;
-            return parseFloat(val.toPrecision(10)).toString();
+            if (!isFinite(val)) return { ansLatex: null, text: null };
+            return { ansLatex: result.latex, text: parseFloat(val.toPrecision(10)).toString() };
         }
         // Decimal.js bignum (has .toNumber())
         if (typeof val.toNumber === 'function') {
             const n = val.toNumber();
-            if (!isFinite(n)) return null;
-            return parseFloat(n.toPrecision(10)).toString();
+            if (!isFinite(n)) return { ansLatex: null, text: null };
+            return { ansLatex: result.latex, text: parseFloat(n.toPrecision(10)).toString() };
         }
-        return val.toString();
+        return { ansLatex: result.latex, text: val.toString() };
     } catch {
-        return null;
+        return { ansLatex: null, text: null };
     }
 }
 
@@ -64,11 +72,14 @@ function updateScope() {
 }
 
 function reevaluateAll() {
+    if (!ce) return;
+    let prevAnsLatex;
     document.querySelectorAll(".expr-row").forEach(row => {
         const mf = row.querySelector("math-field");
         const result = row.querySelector(".result");
-        const val = evalLatex(mf.getValue("latex"));
-        result.textContent = val !== null ? "= " + val : "";
+        const { ansLatex, text } = evaluateLatex(mf.getValue("latex"), prevAnsLatex);
+        result.textContent = text !== null ? "= " + text : "";
+        prevAnsLatex = ansLatex !== null ? ansLatex : undefined;
     });
 }
 
@@ -107,11 +118,10 @@ function createRow() {
 
     mf.mathVirtualKeyboardPolicy = "manual";
     mf.menuItems = [];
+    mf.macros = { ...mf.macros, ans: "\\mathrm{ans}" };
+    mf.inlineShortcuts = { ...mf.inlineShortcuts, ans: "\\ans" };
 
-    mf.addEventListener("input", () => {
-        const val = evalLatex(mf.getValue("latex"));
-        result.textContent = val !== null ? "= " + val : "";
-    });
+    mf.addEventListener("input", reevaluateAll);
 
     mf.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
@@ -125,6 +135,7 @@ function createRow() {
                 const prev = row.previousElementSibling;
                 row.remove();
                 prev.querySelector("math-field").focus();
+                reevaluateAll();
             }
         }
     });
